@@ -1,0 +1,2351 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>แบบตรวจประเมินคุณภาพการบันทึกเวชระเบียนผู้ป่วยนอก/ฉุกเฉิน</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f1a2b;
+    --ink-soft: #324560;
+    --paper: #faf8f3;
+    --paper-edge: #ede7d8;
+    --rule: #c9c0a8;
+    --rule-strong: #4a5568;
+    --accent: #8b1a1a;
+    --accent-soft: #c2410c;
+    --pass: #166534;
+    --pass-bg: #dcfce7;
+    --fail: #991b1b;
+    --fail-bg: #fee2e2;
+    --na: #475569;
+    --na-bg: #e2e8f0;
+    --highlight: #fef3c7;
+    --shadow: 0 1px 0 rgba(15,26,43,.04), 0 8px 24px -12px rgba(15,26,43,.18);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background:
+      radial-gradient(1200px 600px at 10% -10%, #f3eedd 0%, transparent 50%),
+      radial-gradient(900px 500px at 110% 10%, #efe7d2 0%, transparent 50%),
+      #f6f1e3;
+    font-family: 'Sarabun', system-ui, sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  .wrap {
+    max-width: 1280px;
+    margin: 32px auto 80px;
+    padding: 0 24px;
+  }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 0;
+    padding: 0 8px;
+  }
+
+  .tab {
+    padding: 14px 28px;
+    background: transparent;
+    border: 1px solid var(--paper-edge);
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    top: 1px;
+  }
+
+  .tab:hover {
+    color: var(--ink);
+    background: rgba(250, 248, 243, 0.5);
+  }
+
+  .tab.active {
+    background: var(--paper);
+    color: var(--ink);
+    font-weight: 600;
+    border-color: var(--paper-edge);
+  }
+
+  .tab .count {
+    background: var(--accent);
+    color: var(--paper);
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-size: 11px;
+    margin-left: 6px;
+    font-weight: 600;
+  }
+
+  .tab-panel {
+    display: none;
+  }
+  .tab-panel.active {
+    display: block;
+  }
+
+  /* HEADER */
+  .masthead {
+    background: var(--paper);
+    border: 1px solid var(--paper-edge);
+    border-bottom: none;
+    padding: 28px 36px 24px;
+    border-radius: 0 6px 0 0;
+    position: relative;
+    box-shadow: var(--shadow);
+  }
+
+  .masthead::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--accent) 0%, var(--accent) 33%, var(--ink) 33%, var(--ink) 66%, var(--accent-soft) 66%);
+    border-radius: 0 6px 0 0;
+  }
+
+  .crest {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 8px;
+  }
+
+  .crest-left { flex: 1; }
+
+  .eyebrow {
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  h1 {
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    line-height: 1.3;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+
+  .subtitle-en {
+    font-family: 'Sarabun', sans-serif;
+    font-size: 13px;
+    color: var(--ink-soft);
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .crest-badge {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 10px 14px;
+    border-radius: 4px;
+    text-align: center;
+    min-width: 90px;
+  }
+
+  .crest-badge .label {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    opacity: 0.7;
+    margin-bottom: 2px;
+  }
+
+  .crest-badge .name {
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  /* META GRID */
+  .meta-grid {
+    background: var(--paper);
+    border: 1px solid var(--paper-edge);
+    border-top: none;
+    padding: 24px 36px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px 24px;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .field label {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-weight: 600;
+  }
+
+  .field input[type="text"],
+  .field input[type="date"],
+  .field select {
+    border: none;
+    border-bottom: 1.5px solid var(--rule);
+    background: transparent;
+    padding: 6px 2px;
+    font-family: 'Sarabun', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .field input[type="date"] {
+    color-scheme: light;
+    cursor: pointer;
+  }
+
+  .field input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+  }
+
+  .field input[type="date"]:hover::-webkit-calendar-picker-indicator {
+    opacity: 1;
+  }
+
+  .field input:focus,
+  .field select:focus {
+    border-bottom-color: var(--accent);
+    background: var(--highlight);
+  }
+
+  .field.span-2 { grid-column: span 2; }
+
+  .case-toggle {
+    grid-column: span 2;
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+  }
+
+  .case-btn {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1.5px solid var(--rule);
+    background: var(--paper);
+    font-family: 'Sarabun', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+    color: var(--ink-soft);
+  }
+
+  .case-btn:hover {
+    border-color: var(--ink);
+    color: var(--ink);
+  }
+
+  .case-btn.active {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+
+  /* AUDITOR DROPDOWN */
+  .auditor-field {
+    position: relative;
+  }
+
+  .auditor-select-wrap {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .auditor-select-wrap select {
+    flex: 1;
+  }
+
+  .mini-btn {
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--rule);
+    background: var(--paper);
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+
+  .mini-btn:hover {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+
+  /* INSTRUCTIONS */
+  .instructions {
+    background: var(--paper);
+    border-left: 1px solid var(--paper-edge);
+    border-right: 1px solid var(--paper-edge);
+    padding: 16px 36px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--ink-soft);
+    border-top: 1px dashed var(--rule);
+  }
+
+  .instructions .legend-title {
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    font-weight: 600;
+    color: var(--ink);
+    margin-right: 6px;
+  }
+
+  .instructions p { margin: 4px 0; }
+
+  /* TABLE */
+  .table-wrap {
+    background: var(--paper);
+    border: 1px solid var(--paper-edge);
+    border-top: none;
+    padding: 24px 36px;
+    overflow-x: auto;
+  }
+
+  table.audit {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  table.audit thead th {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    padding: 10px 6px;
+    text-align: center;
+    border: 1px solid var(--ink);
+    letter-spacing: 0.02em;
+    vertical-align: middle;
+  }
+
+  table.audit thead th.no-col { width: 36px; }
+  table.audit thead th.content-col { width: 180px; text-align: left; padding-left: 12px; }
+  table.audit thead th.crit-col { width: 64px; }
+  table.audit thead th.score-col { width: 60px; }
+  table.audit thead th.note-col { width: 120px; }
+
+  table.audit tbody td {
+    border: 1px solid var(--rule);
+    padding: 8px 6px;
+    text-align: center;
+    background: #fdfcf7;
+    vertical-align: middle;
+    height: 52px;
+  }
+
+  table.audit tbody td.content {
+    text-align: left;
+    padding: 8px 12px;
+    font-weight: 500;
+    background: #fbf8ee;
+  }
+
+  table.audit tbody td.no {
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    font-weight: 600;
+    color: var(--ink-soft);
+    background: #f5efdc;
+  }
+
+  .fu-row .content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .fu-row .fu-label { font-size: 13px; font-weight: 500; }
+
+  .fu-row .fu-date {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--ink-soft);
+  }
+
+  .fu-row .fu-date input[type="date"] {
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    background: white;
+    padding: 4px 6px;
+    font-family: 'Sarabun', sans-serif;
+    font-size: 12px;
+    color: var(--ink);
+    outline: none;
+  }
+
+  .fu-row .fu-date input[type="date"]:focus {
+    border-color: var(--accent);
+    background: var(--highlight);
+  }
+
+  .score-cell { padding: 0; }
+
+  .score-cell.disabled {
+    background: repeating-linear-gradient(
+      45deg,
+      #e8e0c8,
+      #e8e0c8 4px,
+      #efe7d2 4px,
+      #efe7d2 8px
+    );
+    cursor: not-allowed;
+  }
+
+  .pill-group {
+    display: flex;
+    justify-content: center;
+    gap: 3px;
+    padding: 4px;
+  }
+
+  .pill {
+    width: 22px;
+    height: 26px;
+    border-radius: 3px;
+    border: 1px solid var(--rule);
+    background: white;
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .pill:hover {
+    border-color: var(--ink);
+    color: var(--ink);
+  }
+
+  .pill.active-1 {
+    background: var(--pass-bg);
+    color: var(--pass);
+    border-color: var(--pass);
+  }
+
+  .pill.active-0 {
+    background: var(--fail-bg);
+    color: var(--fail);
+    border-color: var(--fail);
+  }
+
+  .pill.active-na {
+    background: var(--na-bg);
+    color: var(--na);
+    border-color: var(--na);
+    font-size: 9px;
+  }
+
+  .toggle-cell { padding: 0; }
+
+  .toggle-mark {
+    width: 32px;
+    height: 28px;
+    margin: auto;
+    border: 1.5px solid var(--rule);
+    border-radius: 3px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    font-size: 14px;
+    color: transparent;
+    transition: all 0.15s;
+  }
+
+  .toggle-mark:hover { border-color: var(--ink); }
+
+  .toggle-mark.checked {
+    color: var(--accent);
+    background: var(--highlight);
+    border-color: var(--accent);
+    font-weight: 700;
+  }
+
+  .num-input {
+    width: 44px;
+    height: 28px;
+    border: 1px solid var(--rule);
+    background: white;
+    text-align: center;
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    border-radius: 3px;
+    outline: none;
+  }
+
+  .num-input:focus {
+    border-color: var(--accent);
+    background: var(--highlight);
+  }
+
+  .num-input[readonly] {
+    background: #f5efdc;
+    color: var(--ink);
+    font-weight: 700;
+    border-color: transparent;
+    cursor: default;
+  }
+
+  .note-input {
+    width: 100%;
+    border: 1px dotted var(--rule);
+    background: transparent;
+    padding: 4px 6px;
+    font-family: 'Sarabun', sans-serif;
+    font-size: 12px;
+    color: var(--ink-soft);
+    border-radius: 2px;
+    outline: none;
+  }
+
+  .note-input:focus {
+    border-color: var(--accent);
+    border-style: solid;
+    background: var(--highlight);
+  }
+
+  /* SUMMARY */
+  .summary {
+    background: var(--paper);
+    border: 1px solid var(--paper-edge);
+    border-top: none;
+    padding: 28px 36px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+
+  .score-box {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 20px 24px;
+    border-radius: 6px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .score-box::after {
+    content: '';
+    position: absolute;
+    right: -40px;
+    top: -40px;
+    width: 120px;
+    height: 120px;
+    border: 1px dashed rgba(250, 248, 243, 0.15);
+    border-radius: 50%;
+  }
+
+  .score-box .label {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-bottom: 8px;
+  }
+
+  .score-display {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .score-display .num {
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    font-weight: 700;
+    font-size: 56px;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  .score-display .denom {
+    font-size: 24px;
+    opacity: 0.5;
+  }
+
+  .score-display .denom::before { content: '/ '; }
+
+  .threshold-info {
+    font-size: 12px;
+    opacity: 0.85;
+    line-height: 1.5;
+    padding-top: 12px;
+    border-top: 1px solid rgba(250, 248, 243, 0.15);
+  }
+
+  .threshold-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    margin-top: 8px;
+  }
+
+  .threshold-badge.pass {
+    background: var(--pass-bg);
+    color: var(--pass);
+  }
+
+  .threshold-badge.fail {
+    background: var(--fail-bg);
+    color: var(--fail);
+  }
+
+  .findings h3 {
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    font-size: 14px;
+    margin: 0 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--ink);
+    letter-spacing: 0.02em;
+  }
+
+  .findings .radio-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 4px;
+    transition: background 0.15s;
+  }
+
+  .findings .radio-row:hover { background: var(--highlight); }
+
+  .findings input[type="radio"] {
+    margin-top: 3px;
+    accent-color: var(--accent);
+  }
+
+  .findings .radio-content {
+    flex: 1;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .findings .radio-content .en {
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .findings .radio-content .th {
+    color: var(--ink-soft);
+    font-size: 12px;
+  }
+
+  .findings .specify {
+    margin-top: 6px;
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid var(--rule);
+    background: transparent;
+    padding: 4px 2px;
+    font-family: 'Sarabun', sans-serif;
+    font-size: 12px;
+    outline: none;
+  }
+
+  .findings .specify:focus {
+    border-bottom-color: var(--accent);
+    background: var(--highlight);
+  }
+
+  /* FOOTER */
+  .footer-section {
+    background: var(--paper);
+    border: 1px solid var(--paper-edge);
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    padding: 24px 36px 28px;
+  }
+
+  .footnote {
+    font-size: 12px;
+    color: var(--ink-soft);
+    font-style: italic;
+    margin-bottom: 20px;
+    padding: 8px 12px;
+    background: #fbf8ee;
+    border-left: 3px solid var(--accent);
+    border-radius: 0 4px 4px 0;
+  }
+
+  .signature {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  .actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 24px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    padding: 11px 22px;
+    border: 1.5px solid var(--ink);
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+  }
+
+  .btn:hover {
+    background: var(--ink);
+    color: var(--paper);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px -4px rgba(15,26,43,0.3);
+  }
+
+  .btn.primary {
+    background: var(--accent);
+    color: var(--paper);
+    border-color: var(--accent);
+  }
+
+  .btn.primary:hover {
+    background: #6b1414;
+    border-color: #6b1414;
+  }
+
+  .btn.ghost {
+    border-color: var(--rule);
+    color: var(--ink-soft);
+  }
+
+  .btn.ghost:hover {
+    border-color: var(--ink-soft);
+    background: var(--ink-soft);
+    color: var(--paper);
+  }
+
+  /* ========= DASHBOARD ========= */
+  .dash-shell {
+    background: var(--paper);
+    border: 1px solid var(--paper-edge);
+    border-radius: 0 6px 6px 6px;
+    box-shadow: var(--shadow);
+    padding: 32px 36px;
+    position: relative;
+  }
+
+  .dash-shell::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--ink) 0%, var(--ink) 33%, var(--accent) 33%, var(--accent) 66%, var(--accent-soft) 66%);
+    border-radius: 0 6px 0 0;
+  }
+
+  .dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--paper-edge);
+  }
+
+  .dash-header h2 {
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    font-size: 24px;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  .dash-header .eyebrow { margin-bottom: 4px; }
+
+  .dash-filters {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+  }
+
+  .dash-filters .field { min-width: 130px; }
+
+  .dash-filters select,
+  .dash-filters input {
+    border: 1px solid var(--rule);
+    background: white;
+    border-radius: 3px;
+    padding: 8px 10px;
+    font-family: 'Sarabun', sans-serif;
+    font-size: 13px;
+    color: var(--ink);
+    outline: none;
+  }
+
+  .dash-filters select:focus,
+  .dash-filters input:focus {
+    border-color: var(--accent);
+  }
+
+  /* KPI CARDS */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .kpi {
+    background: white;
+    border: 1px solid var(--paper-edge);
+    border-radius: 6px;
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .kpi::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: var(--accent);
+  }
+
+  .kpi.kpi-pass::before { background: var(--pass); }
+  .kpi.kpi-fail::before { background: var(--fail); }
+  .kpi.kpi-avg::before { background: var(--accent-soft); }
+
+  .kpi .kpi-label {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .kpi .kpi-value {
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+
+  .kpi .kpi-sub {
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-top: 6px;
+  }
+
+  /* CHART */
+  .chart-card {
+    background: white;
+    border: 1px solid var(--paper-edge);
+    border-radius: 6px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+
+  .chart-card h3 {
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    font-size: 15px;
+    margin: 0 0 4px;
+    color: var(--ink);
+  }
+
+  .chart-card .sub {
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-bottom: 18px;
+  }
+
+  .bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    min-height: 220px;
+    padding: 12px 8px 8px;
+    border-bottom: 1.5px solid var(--ink);
+    position: relative;
+  }
+
+  .bar-chart .axis-line {
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    border-top: 1px dashed var(--rule);
+    pointer-events: none;
+  }
+
+  .bar-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .bar-stack {
+    width: 100%;
+    max-width: 56px;
+    display: flex;
+    flex-direction: column-reverse;
+    border-radius: 3px 3px 0 0;
+    overflow: hidden;
+    background: #f5efdc;
+    position: relative;
+  }
+
+  .bar-pass {
+    background: linear-gradient(180deg, var(--pass) 0%, #14532d 100%);
+    transition: height 0.5s ease;
+  }
+
+  .bar-fail {
+    background: linear-gradient(180deg, var(--fail) 0%, #7f1d1d 100%);
+    transition: height 0.5s ease;
+  }
+
+  .bar-label {
+    font-size: 11px;
+    color: var(--ink-soft);
+    font-weight: 500;
+    text-align: center;
+  }
+
+  .bar-value {
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .chart-legend {
+    display: flex;
+    gap: 18px;
+    margin-top: 14px;
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+
+  .chart-legend .swatch {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+
+  .chart-legend .swatch.pass { background: var(--pass); }
+  .chart-legend .swatch.fail { background: var(--fail); }
+
+  /* CASE TABLE */
+  .case-table-wrap {
+    background: white;
+    border: 1px solid var(--paper-edge);
+    border-radius: 6px;
+    padding: 24px;
+    overflow-x: auto;
+  }
+
+  .case-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .case-table thead th {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    padding: 10px 12px;
+    text-align: left;
+    border: 1px solid var(--ink);
+    letter-spacing: 0.02em;
+  }
+
+  .case-table tbody td {
+    border: 1px solid var(--paper-edge);
+    padding: 10px 12px;
+    background: white;
+  }
+
+  .case-table tbody tr:nth-child(even) td { background: #fbf8ee; }
+  .case-table tbody tr:hover td { background: var(--highlight); }
+
+  .case-table .status-pass {
+    color: var(--pass);
+    font-weight: 600;
+    background: var(--pass-bg);
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-size: 11px;
+    display: inline-block;
+  }
+
+  .case-table .status-fail {
+    color: var(--fail);
+    font-weight: 600;
+    background: var(--fail-bg);
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-size: 11px;
+    display: inline-block;
+  }
+
+  .row-action {
+    background: transparent;
+    border: 1px solid var(--rule);
+    color: var(--ink-soft);
+    padding: 4px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 11px;
+    font-family: inherit;
+    margin-right: 4px;
+    transition: all 0.15s;
+  }
+
+  .row-action:hover {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+
+  .row-action.danger:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--ink-soft);
+  }
+
+  .empty-state .icon {
+    font-size: 48px;
+    opacity: 0.3;
+    margin-bottom: 12px;
+  }
+
+  /* DIALOG */
+  .dialog-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 26, 43, 0.5);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .dialog-backdrop.show {
+    display: flex;
+  }
+
+  .dialog {
+    background: var(--paper);
+    border-radius: 6px;
+    padding: 28px;
+    width: 90%;
+    max-width: 480px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+
+  .dialog h3 {
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    margin: 0 0 8px;
+    font-size: 18px;
+  }
+
+  .dialog .sub {
+    color: var(--ink-soft);
+    font-size: 13px;
+    margin-bottom: 18px;
+  }
+
+  .auditor-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 280px;
+    overflow-y: auto;
+    margin-bottom: 16px;
+    padding-right: 4px;
+  }
+
+  .auditor-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    border: 1px solid var(--paper-edge);
+    border-radius: 3px;
+    padding: 6px 10px;
+  }
+
+  .auditor-item input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+    padding: 4px 0;
+  }
+
+  .auditor-item input:focus {
+    background: var(--highlight);
+  }
+
+  .auditor-item .remove {
+    background: transparent;
+    border: none;
+    color: var(--accent);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 2px 6px;
+  }
+
+  .auditor-item .remove:hover { color: #6b1414; }
+
+  .dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  /* PRINT */
+  @media print {
+    body { background: white; }
+    .wrap { margin: 0; padding: 0; max-width: 100%; }
+    .actions, .tabs, .dash-shell { display: none; }
+    .masthead, .meta-grid, .instructions, .table-wrap, .summary, .footer-section {
+      border: 1px solid #999;
+      box-shadow: none;
+    }
+    .pill { border: 1px solid #333; }
+    .num-input { border: 1px solid #999; }
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .meta-grid { grid-template-columns: repeat(2, 1fr); }
+    .summary { grid-template-columns: 1fr; }
+    .signature { grid-template-columns: 1fr; }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .wrap { padding: 0 12px; }
+    .masthead, .meta-grid, .instructions, .table-wrap, .summary, .footer-section, .dash-shell {
+      padding-left: 18px; padding-right: 18px;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- TABS -->
+  <nav class="tabs">
+    <button class="tab active" data-tab="audit">📋 Audit Form</button>
+    <button class="tab" data-tab="dashboard">📊 Dashboard <span class="count" id="case-count">0</span></button>
+  </nav>
+
+  <!-- =================== AUDIT TAB =================== -->
+  <div class="tab-panel active" id="tab-audit">
+
+  <header class="masthead">
+    <div class="crest">
+      <div class="crest-left">
+        <div class="eyebrow">Medical Record Audit Form · OPD / ER</div>
+        <h1>แบบตรวจประเมินคุณภาพการบันทึกเวชระเบียนผู้ป่วยนอก/ฉุกเฉิน</h1>
+        <div class="subtitle-en">National Health Security Office — Quality Assurance Documentation</div>
+      </div>
+      <div class="crest-badge">
+        <div class="label">สำนักงาน</div>
+        <div class="name">สปสช.</div>
+      </div>
+    </div>
+  </header>
+
+  <section class="meta-grid">
+    <div class="field">
+      <label>Hcode</label>
+      <input type="text" id="hcode" value="10894">
+    </div>
+    <div class="field">
+      <label>Hname</label>
+      <input type="text" id="hname" value="โรงพยาบาลวังน้ำเขียว">
+    </div>
+    <div class="field">
+      <label>HN</label>
+      <input type="text" id="hn">
+    </div>
+    <div class="field">
+      <label>PID</label>
+      <input type="text" id="pid">
+    </div>
+
+    <div class="case-toggle">
+      <button type="button" class="case-btn active" data-case="general">☐ General case</button>
+      <button type="button" class="case-btn" data-case="chronic">☐ Chronic case</button>
+    </div>
+    <div class="field span-2">
+      <label>Diagnosis</label>
+      <input type="text" id="diagnosis">
+    </div>
+
+    <div class="field">
+      <label>Visit Date</label>
+      <input type="date" id="visit-date">
+    </div>
+    <div class="field">
+      <label>1<sup>st</sup> Visit Date</label>
+      <input type="date" id="first-visit">
+    </div>
+    <div class="field span-2">
+      <label>ช่วงเวลาที่ตรวจสอบ</label>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <input type="date" id="period-from" style="flex:1; border:none; border-bottom:1.5px solid var(--rule); padding:6px 2px; font-family:inherit; font-size:14px; outline:none;">
+        <span style="color:var(--ink-soft); font-size:12px;">ถึง</span>
+        <input type="date" id="period-to" style="flex:1; border:none; border-bottom:1.5px solid var(--rule); padding:6px 2px; font-family:inherit; font-size:14px; outline:none;">
+      </div>
+    </div>
+  </section>
+
+  <section class="instructions">
+    <p><span class="legend-title">การบันทึกช่อง NA:</span> กรณีไม่จำเป็นต้องมีเอกสารใน Content ได้แก่ Follow up, Operative note, Informed consent, Rehabilitation record เนื่องจากไม่มีการให้บริการ ให้กากบาทในช่อง NA</p>
+    <p><span class="legend-title">การบันทึกช่อง Missing:</span> กรณีไม่มีเอกสารให้ตรวจสอบ เวชระเบียนไม่ครบ หรือหายไป ให้กากบาทในช่อง Missing</p>
+    <p><span class="legend-title">การบันทึกคะแนน:</span> (1) ผ่านเกณฑ์ = <strong style="color:var(--pass);">1</strong> &nbsp;|&nbsp; (2) ไม่ผ่านเกณฑ์ = <strong style="color:var(--fail);">0</strong> &nbsp;|&nbsp; (3) ไม่จำเป็นต้องมีบันทึก = <strong style="color:var(--na);">NA</strong></p>
+  </section>
+
+  <section class="table-wrap">
+    <table class="audit">
+      <thead>
+        <tr>
+          <th class="no-col" rowspan="2">No</th>
+          <th class="content-col" rowspan="2">Contents</th>
+          <th class="crit-col" rowspan="2">NA</th>
+          <th class="crit-col" rowspan="2">Missing</th>
+          <th colspan="7">เกณฑ์การประเมิน (1 = ผ่าน, 0 = ไม่ผ่าน, NA = ไม่ต้องประเมิน)</th>
+          <th class="crit-col" rowspan="2">เพิ่ม<br>คะแนน</th>
+          <th class="crit-col" rowspan="2">หัก<br>คะแนน</th>
+          <th class="score-col" rowspan="2">คะแนน<br>เต็ม</th>
+          <th class="score-col" rowspan="2">คะแนน<br>ที่ได้</th>
+          <th class="note-col" rowspan="2">หมายเหตุ</th>
+        </tr>
+        <tr>
+          <th class="crit-col">ข้อ 1</th>
+          <th class="crit-col">ข้อ 2</th>
+          <th class="crit-col">ข้อ 3</th>
+          <th class="crit-col">ข้อ 4</th>
+          <th class="crit-col">ข้อ 5</th>
+          <th class="crit-col">ข้อ 6</th>
+          <th class="crit-col">ข้อ 7</th>
+        </tr>
+      </thead>
+      <tbody id="audit-body"></tbody>
+    </table>
+  </section>
+
+  <section class="summary">
+    <div>
+      <div class="score-box">
+        <div class="label">Sum Score · คะแนนที่ได้</div>
+        <div class="score-display">
+          <span class="num" id="total-score">0</span>
+          <span class="denom" id="full-score">0</span>
+        </div>
+        <div class="threshold-info">
+          <div>เกณฑ์ผ่าน: <strong id="threshold-text">≥ 14 คะแนน (General case)</strong></div>
+          <div>ผู้ป่วยนอกโรคเรื้อรัง (Chronic) ที่มี follow up อย่างน้อย 1 ครั้ง: ≥ 18 คะแนน</div>
+          <span class="threshold-badge fail" id="threshold-badge">ยังไม่ผ่านเกณฑ์</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="findings">
+      <h3>ประเมินคุณภาพการบันทึกเวชระเบียนในภาพรวม · Overall Finding</h3>
+      <p style="font-size:12px; color:var(--ink-soft); margin:0 0 12px;">(เลือกเพียง 1 ข้อ)</p>
+
+      <label class="radio-row">
+        <input type="radio" name="finding" value="inadequate">
+        <div class="radio-content">
+          <div class="en">Documentation inadequate for meaningful review</div>
+          <div class="th">ข้อมูลไม่เพียงพอสำหรับการทบทวน</div>
+        </div>
+      </label>
+
+      <label class="radio-row">
+        <input type="radio" name="finding" value="no-issue">
+        <div class="radio-content">
+          <div class="en">No significant medical record issue identified</div>
+          <div class="th">ไม่มีปัญหาสำคัญจากการทบทวน</div>
+        </div>
+      </label>
+
+      <label class="radio-row">
+        <input type="radio" name="finding" value="issues">
+        <div class="radio-content">
+          <div class="en">Certain issues in question — specify</div>
+          <div class="th">มีปัญหาจากการทบทวนที่ต้องค้นต่อ ระบุ:</div>
+          <input type="text" class="specify" id="issues-specify" placeholder="ระบุปัญหา...">
+        </div>
+      </label>
+    </div>
+  </section>
+
+  <section class="footer-section">
+    <div class="footnote">
+      <strong>หมายเหตุ:</strong> Rehabilitation record * ใช้ในกรณีประเมินคุณภาพการบันทึกเวชระเบียนผู้ป่วยจิตเวช (ผู้ป่วยนอก/ฉุกเฉิน)
+    </div>
+
+    <div class="signature">
+      <div class="field auditor-field">
+        <label>Audit by · ผู้ตรวจประเมิน</label>
+        <div class="auditor-select-wrap">
+          <select id="auditor-select"></select>
+          <button type="button" class="mini-btn" id="manage-auditor-btn" title="จัดการรายชื่อ">⚙</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Audit Date · วันที่ตรวจประเมิน</label>
+        <input type="date" id="audit-date">
+      </div>
+    </div>
+
+    <div class="actions">
+      <input type="file" id="restore-input" accept="application/json" style="display:none;">
+      <button type="button" class="btn ghost" onclick="resetForm()">↺ ล้างฟอร์ม</button>
+      <button type="button" class="btn ghost" onclick="document.getElementById('restore-input').click()">⤴ Restore (โหลด JSON)</button>
+      <button type="button" class="btn" onclick="window.print()">🖨 พิมพ์</button>
+      <button type="button" class="btn" onclick="exportJSON()">⬇ Export JSON</button>
+      <button type="button" class="btn primary" onclick="saveForm()">💾 บันทึกเคส</button>
+    </div>
+  </section>
+
+  </div>
+
+  <!-- =================== DASHBOARD TAB =================== -->
+  <div class="tab-panel" id="tab-dashboard">
+    <div class="dash-shell">
+      <div class="dash-header">
+        <div>
+          <div class="eyebrow">Audit Dashboard · ภาพรวมการตรวจประเมิน</div>
+          <h2>สรุปผลการตรวจเวชระเบียน</h2>
+        </div>
+        <div class="dash-filters">
+          <div class="field">
+            <label>ช่วงเวลา</label>
+            <select id="filter-period">
+              <option value="month">รายเดือน</option>
+              <option value="year">รายปี</option>
+              <option value="all">ทั้งหมด</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>ปี</label>
+            <select id="filter-year"></select>
+          </div>
+          <div class="field" id="month-filter-wrap">
+            <label>เดือน</label>
+            <select id="filter-month">
+              <option value="all">ทั้งหมด</option>
+              <option value="0">มกราคม</option>
+              <option value="1">กุมภาพันธ์</option>
+              <option value="2">มีนาคม</option>
+              <option value="3">เมษายน</option>
+              <option value="4">พฤษภาคม</option>
+              <option value="5">มิถุนายน</option>
+              <option value="6">กรกฎาคม</option>
+              <option value="7">สิงหาคม</option>
+              <option value="8">กันยายน</option>
+              <option value="9">ตุลาคม</option>
+              <option value="10">พฤศจิกายน</option>
+              <option value="11">ธันวาคม</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>ผู้ประเมิน</label>
+            <select id="filter-auditor">
+              <option value="all">ทั้งหมด</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>ประเภท</label>
+            <select id="filter-case-type">
+              <option value="all">ทั้งหมด</option>
+              <option value="general">General</option>
+              <option value="chronic">Chronic</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI -->
+      <div class="kpi-grid">
+        <div class="kpi">
+          <div class="kpi-label">จำนวนเคสที่ตรวจ</div>
+          <div class="kpi-value" id="kpi-total">0</div>
+          <div class="kpi-sub">เคสในช่วงที่เลือก</div>
+        </div>
+        <div class="kpi kpi-pass">
+          <div class="kpi-label">ผ่านเกณฑ์</div>
+          <div class="kpi-value" id="kpi-pass">0</div>
+          <div class="kpi-sub" id="kpi-pass-pct">0%</div>
+        </div>
+        <div class="kpi kpi-fail">
+          <div class="kpi-label">ไม่ผ่านเกณฑ์</div>
+          <div class="kpi-value" id="kpi-fail">0</div>
+          <div class="kpi-sub" id="kpi-fail-pct">0%</div>
+        </div>
+        <div class="kpi kpi-avg">
+          <div class="kpi-label">คะแนนเฉลี่ย</div>
+          <div class="kpi-value" id="kpi-avg">0</div>
+          <div class="kpi-sub" id="kpi-avg-sub">จากคะแนนเต็มเฉลี่ย</div>
+        </div>
+      </div>
+
+      <!-- CHART -->
+      <div class="chart-card">
+        <h3>กราฟผลการตรวจ</h3>
+        <div class="sub" id="chart-sub">แสดงสัดส่วนผ่าน/ไม่ผ่าน แยกตามช่วงเวลา</div>
+        <div class="bar-chart" id="bar-chart"></div>
+        <div class="chart-legend">
+          <span><span class="swatch pass"></span>ผ่านเกณฑ์</span>
+          <span><span class="swatch fail"></span>ไม่ผ่านเกณฑ์</span>
+        </div>
+      </div>
+
+      <!-- CASE TABLE -->
+      <div class="case-table-wrap">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:12px;">
+          <h3 style="font-family:'IBM Plex Sans Thai',sans-serif; font-size:15px; margin:0;">รายการเคสที่บันทึก</h3>
+          <div style="display:flex; gap:8px;">
+            <button class="btn ghost" onclick="exportAllJSON()" style="padding:8px 14px; font-size:12px;">⬇ Export ทั้งหมด</button>
+            <button class="btn ghost" onclick="exportCSV()" style="padding:8px 14px; font-size:12px;">📊 Export CSV</button>
+            <button class="btn ghost" onclick="clearAllCases()" style="padding:8px 14px; font-size:12px; border-color:var(--accent); color:var(--accent);">🗑 ล้างทั้งหมด</button>
+          </div>
+        </div>
+        <table class="case-table" id="case-table">
+          <thead>
+            <tr>
+              <th>วันที่ตรวจ</th>
+              <th>HN</th>
+              <th>Diagnosis</th>
+              <th>ประเภท</th>
+              <th>ผู้ประเมิน</th>
+              <th style="text-align:center;">คะแนน</th>
+              <th style="text-align:center;">สถานะ</th>
+              <th style="text-align:center;">การดำเนินการ</th>
+            </tr>
+          </thead>
+          <tbody id="case-table-body"></tbody>
+        </table>
+        <div id="empty-state" class="empty-state" style="display:none;">
+          <div class="icon">📋</div>
+          <div>ยังไม่มีเคสที่บันทึก — กลับไปกรอกฟอร์มและกด "บันทึกเคส" เพื่อเริ่มต้น</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AUDITOR MANAGEMENT DIALOG -->
+<div class="dialog-backdrop" id="auditor-dialog">
+  <div class="dialog">
+    <h3>จัดการรายชื่อผู้ประเมิน</h3>
+    <div class="sub">เพิ่ม / แก้ไข / ลบรายชื่อผู้ทำการตรวจประเมินเวชระเบียน</div>
+    <div class="auditor-list" id="auditor-list"></div>
+    <button type="button" class="btn ghost" id="add-auditor-btn" style="width:100%;">+ เพิ่มรายชื่อ</button>
+    <div class="dialog-actions">
+      <button type="button" class="btn ghost" onclick="closeAuditorDialog()">ยกเลิก</button>
+      <button type="button" class="btn primary" onclick="saveAuditors()">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ================================================================
+     STATE
+  ================================================================ */
+  const STORAGE_KEY = 'opd_audit_cases_v1';
+  const AUDITOR_KEY = 'opd_audit_auditors_v1';
+  const DEFAULT_AUDITORS = [
+    'นพ.สมชาย รักษ์เวชระเบียน',
+    'พญ.วิภา ตรวจสอบดี',
+    'น.ส.พรพิมล คุณภาพ',
+    'นางสาวมาลี เอกสารครบ',
+    'นายอนันต์ บันทึกได้'
+  ];
+
+  let auditors = JSON.parse(localStorage.getItem(AUDITOR_KEY) || 'null') || DEFAULT_AUDITORS.slice();
+  let cases = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  let caseType = 'general';
+  let editingCaseId = null;
+
+  /* ================================================================
+     ROW DEFINITIONS — Treatment now has 7 criteria
+  ================================================================ */
+  const rows = [
+    { id: 'profile', no: '1', label: "Patient's Profile", criteria: 7 },
+    { id: 'history', no: '2', label: "History (1<sup>st</sup> visit)", criteria: 7 },
+    { id: 'pe', no: '3', label: "Physical examination / Diagnosis", criteria: 7 },
+    { id: 'tx', no: '4', label: "Treatment / Investigation", criteria: 7 },
+    { id: 'fu1', no: '5', label: "Follow up ครั้งที่ 1", criteria: 7, isFU: true },
+    { id: 'fu2', no: '',  label: "Follow up ครั้งที่ 2", criteria: 7, isFU: true },
+    { id: 'fu3', no: '',  label: "Follow up ครั้งที่ 3", criteria: 7, isFU: true },
+    { id: 'op',  no: '6', label: "Operative note", criteria: 7 },
+    { id: 'ic',  no: '7', label: "Informed consent", criteria: 7 },
+    { id: 'rehab', no: '8', label: "Rehabilitation record *", criteria: 7 },
+  ];
+
+  /* ================================================================
+     BUILD AUDIT TABLE
+  ================================================================ */
+  const tbody = document.getElementById('audit-body');
+  rows.forEach(row => {
+    const tr = document.createElement('tr');
+    if (row.isFU) tr.classList.add('fu-row');
+    tr.dataset.rowId = row.id;
+
+    let contentHTML;
+    if (row.isFU) {
+      contentHTML = `
+        <td class="content">
+          <div class="fu-label">${row.label}</div>
+          <div class="fu-date">
+            <input type="date" data-fu-date="${row.id}" style="width:100%; max-width:140px;">
+          </div>
+        </td>`;
+    } else {
+      contentHTML = `<td class="content">${row.label}</td>`;
+    }
+
+    const naCell = `<td class="toggle-cell"><div class="toggle-mark" data-toggle="na" data-row="${row.id}">✗</div></td>`;
+    const missCell = `<td class="toggle-cell"><div class="toggle-mark" data-toggle="missing" data-row="${row.id}">✗</div></td>`;
+
+    let critCells = '';
+    for (let i = 1; i <= 7; i++) {
+      if (i <= row.criteria) {
+        critCells += `
+          <td class="score-cell">
+            <div class="pill-group" data-row="${row.id}" data-crit="${i}">
+              <button type="button" class="pill" data-val="1">1</button>
+              <button type="button" class="pill" data-val="0">0</button>
+              <button type="button" class="pill" data-val="na">NA</button>
+            </div>
+          </td>`;
+      } else {
+        critCells += `<td class="score-cell disabled"></td>`;
+      }
+    }
+
+    const bonusCell = `<td><input type="number" class="num-input bonus" data-row="${row.id}" value="0" min="0"></td>`;
+    const deductCell = `<td><input type="number" class="num-input deduct" data-row="${row.id}" value="0" min="0"></td>`;
+    const fullCell = `<td><input type="text" class="num-input full-score" data-row="${row.id}" readonly value="${row.criteria}"></td>`;
+    const earnedCell = `<td><input type="text" class="num-input earned-score" data-row="${row.id}" readonly value="0"></td>`;
+    const noteCell = `<td><input type="text" class="note-input" data-row="${row.id}"></td>`;
+
+    tr.innerHTML = `<td class="no">${row.no}</td>` + contentHTML + naCell + missCell + critCells + bonusCell + deductCell + fullCell + earnedCell + noteCell;
+    tbody.appendChild(tr);
+  });
+
+  /* ================================================================
+     TABS
+  ================================================================ */
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      document.getElementById('tab-' + t.dataset.tab).classList.add('active');
+      if (t.dataset.tab === 'dashboard') renderDashboard();
+    });
+  });
+
+  /* ================================================================
+     CASE TYPE TOGGLE
+  ================================================================ */
+  document.querySelectorAll('.case-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.case-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      caseType = btn.dataset.case;
+      relabelCaseBtns();
+      updateThreshold();
+    });
+  });
+  function relabelCaseBtns() {
+    document.querySelectorAll('.case-btn').forEach(b => {
+      b.textContent = (b.classList.contains('active') ? '☑ ' : '☐ ') + (b.dataset.case === 'general' ? 'General case' : 'Chronic case');
+    });
+  }
+  relabelCaseBtns();
+
+  /* ================================================================
+     PILL CLICK
+  ================================================================ */
+  document.querySelectorAll('.pill-group').forEach(group => {
+    group.querySelectorAll('.pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        const val = pill.dataset.val;
+        group.querySelectorAll('.pill').forEach(p => p.className = 'pill');
+        if (group.dataset.activeVal === val) {
+          delete group.dataset.activeVal;
+        } else {
+          pill.classList.add('active-' + (val === 'na' ? 'na' : val));
+          group.dataset.activeVal = val;
+        }
+        recalc();
+      });
+    });
+  });
+
+  document.querySelectorAll('.toggle-mark').forEach(t => {
+    t.addEventListener('click', () => {
+      t.classList.toggle('checked');
+      recalc();
+    });
+  });
+
+  document.querySelectorAll('.num-input.bonus, .num-input.deduct').forEach(inp => {
+    inp.addEventListener('input', recalc);
+  });
+
+  /* ================================================================
+     RECALCULATE
+  ================================================================ */
+  function recalc() {
+    let totalEarned = 0;
+    let totalFull = 0;
+
+    rows.forEach(row => {
+      const groups = document.querySelectorAll(`.pill-group[data-row="${row.id}"]`);
+      let earned = 0;
+      let full = 0;
+
+      groups.forEach(g => {
+        const val = g.dataset.activeVal;
+        if (val === '1') { earned += 1; full += 1; }
+        else if (val === '0') { full += 1; }
+        else if (val === 'na') { /* skip */ }
+        else { full += 1; }
+      });
+
+      const bonus = parseInt(document.querySelector(`.bonus[data-row="${row.id}"]`).value) || 0;
+      const deduct = parseInt(document.querySelector(`.deduct[data-row="${row.id}"]`).value) || 0;
+
+      const naToggle = document.querySelector(`.toggle-mark[data-toggle="na"][data-row="${row.id}"]`);
+      const missToggle = document.querySelector(`.toggle-mark[data-toggle="missing"][data-row="${row.id}"]`);
+
+      let rowEarned = earned + bonus - deduct;
+      let rowFull = full;
+
+      if (naToggle.classList.contains('checked')) {
+        rowEarned = 0;
+        rowFull = 0;
+      } else if (missToggle.classList.contains('checked')) {
+        rowEarned = 0;
+      }
+
+      document.querySelector(`.earned-score[data-row="${row.id}"]`).value = rowEarned;
+      document.querySelector(`.full-score[data-row="${row.id}"]`).value = rowFull;
+
+      totalEarned += rowEarned;
+      totalFull += rowFull;
+    });
+
+    document.getElementById('total-score').textContent = totalEarned;
+    document.getElementById('full-score').textContent = totalFull;
+    updateThreshold(totalEarned);
+  }
+
+  function updateThreshold(score) {
+    if (score === undefined) score = parseInt(document.getElementById('total-score').textContent) || 0;
+    const threshold = caseType === 'general' ? 14 : 18;
+    const text = caseType === 'general'
+      ? '≥ 14 คะแนน (General case)'
+      : '≥ 18 คะแนน (Chronic case)';
+    document.getElementById('threshold-text').innerHTML = '<strong>' + text + '</strong>';
+
+    const badge = document.getElementById('threshold-badge');
+    if (score >= threshold) {
+      badge.className = 'threshold-badge pass';
+      badge.textContent = '✓ ผ่านเกณฑ์';
+    } else {
+      badge.className = 'threshold-badge fail';
+      badge.textContent = '✗ ยังไม่ผ่านเกณฑ์ (ขาดอีก ' + (threshold - score) + ' คะแนน)';
+    }
+  }
+
+  /* ================================================================
+     AUDITOR MANAGEMENT
+  ================================================================ */
+  function refreshAuditorSelects() {
+    const sel = document.getElementById('auditor-select');
+    const filterSel = document.getElementById('filter-auditor');
+    const currentVal = sel.value;
+    const currentFilter = filterSel.value;
+
+    sel.innerHTML = '<option value="">— เลือกผู้ประเมิน —</option>' +
+      auditors.map(a => `<option value="${escapeAttr(a)}">${escapeHTML(a)}</option>`).join('');
+
+    filterSel.innerHTML = '<option value="all">ทั้งหมด</option>' +
+      auditors.map(a => `<option value="${escapeAttr(a)}">${escapeHTML(a)}</option>`).join('');
+
+    if (auditors.includes(currentVal)) sel.value = currentVal;
+    if (currentFilter === 'all' || auditors.includes(currentFilter)) filterSel.value = currentFilter;
+  }
+
+  function openAuditorDialog() {
+    const list = document.getElementById('auditor-list');
+    list.innerHTML = '';
+    auditors.forEach((a, i) => {
+      addAuditorRow(a, i);
+    });
+    document.getElementById('auditor-dialog').classList.add('show');
+  }
+  function closeAuditorDialog() {
+    document.getElementById('auditor-dialog').classList.remove('show');
+  }
+  function addAuditorRow(name = '', i = null) {
+    const list = document.getElementById('auditor-list');
+    const div = document.createElement('div');
+    div.className = 'auditor-item';
+    div.innerHTML = `
+      <input type="text" value="${escapeAttr(name)}" placeholder="ชื่อผู้ประเมิน">
+      <button type="button" class="remove" title="ลบ">×</button>
+    `;
+    div.querySelector('.remove').addEventListener('click', () => div.remove());
+    list.appendChild(div);
+  }
+  document.getElementById('add-auditor-btn').addEventListener('click', () => addAuditorRow());
+  document.getElementById('manage-auditor-btn').addEventListener('click', openAuditorDialog);
+
+  function saveAuditors() {
+    const inputs = document.querySelectorAll('#auditor-list input');
+    const newList = [];
+    inputs.forEach(inp => {
+      const v = inp.value.trim();
+      if (v) newList.push(v);
+    });
+    if (newList.length === 0) {
+      alert('ต้องมีรายชื่ออย่างน้อย 1 คน');
+      return;
+    }
+    auditors = newList;
+    localStorage.setItem(AUDITOR_KEY, JSON.stringify(auditors));
+    refreshAuditorSelects();
+    closeAuditorDialog();
+  }
+
+  refreshAuditorSelects();
+
+  /* ================================================================
+     DATA GATHER / RESTORE
+  ================================================================ */
+  function gatherData() {
+    const data = {
+      id: editingCaseId || ('case_' + Date.now()),
+      saved_at: new Date().toISOString(),
+      meta: {
+        hcode: document.getElementById('hcode').value,
+        hname: document.getElementById('hname').value,
+        hn: document.getElementById('hn').value,
+        pid: document.getElementById('pid').value,
+        diagnosis: document.getElementById('diagnosis').value,
+        case_type: caseType,
+        visit_date: document.getElementById('visit-date').value,
+        first_visit: document.getElementById('first-visit').value,
+        period_from: document.getElementById('period-from').value,
+        period_to: document.getElementById('period-to').value,
+      },
+      rows: rows.map(row => {
+        const criteria = [];
+        document.querySelectorAll(`.pill-group[data-row="${row.id}"]`).forEach((g, i) => {
+          criteria.push({ no: i + 1, value: g.dataset.activeVal || null });
+        });
+        const fuDate = row.isFU ? ((document.querySelector(`[data-fu-date="${row.id}"]`) || {}).value || '') : null;
+        return {
+          id: row.id,
+          label: row.label.replace(/<[^>]+>/g, ''),
+          na: document.querySelector(`.toggle-mark[data-toggle="na"][data-row="${row.id}"]`).classList.contains('checked'),
+          missing: document.querySelector(`.toggle-mark[data-toggle="missing"][data-row="${row.id}"]`).classList.contains('checked'),
+          criteria: criteria,
+          bonus: parseInt(document.querySelector(`.bonus[data-row="${row.id}"]`).value) || 0,
+          deduct: parseInt(document.querySelector(`.deduct[data-row="${row.id}"]`).value) || 0,
+          full_score: parseInt(document.querySelector(`.full-score[data-row="${row.id}"]`).value) || 0,
+          earned_score: parseInt(document.querySelector(`.earned-score[data-row="${row.id}"]`).value) || 0,
+          note: document.querySelector(`.note-input[data-row="${row.id}"]`).value,
+          fu_date: fuDate,
+        };
+      }),
+      summary: {
+        total_earned: parseInt(document.getElementById('total-score').textContent) || 0,
+        total_full: parseInt(document.getElementById('full-score').textContent) || 0,
+        threshold: caseType === 'general' ? 14 : 18,
+        finding: (document.querySelector('input[name="finding"]:checked') || {}).value || null,
+        issues_specify: document.getElementById('issues-specify').value,
+      },
+      signature: {
+        auditor: document.getElementById('auditor-select').value,
+        audit_date: document.getElementById('audit-date').value,
+      }
+    };
+    return data;
+  }
+
+  function loadData(data) {
+    if (!data || !data.meta) {
+      alert('ไฟล์ JSON ไม่ถูกต้อง');
+      return;
+    }
+    // META
+    document.getElementById('hcode').value = data.meta.hcode || '';
+    document.getElementById('hname').value = data.meta.hname || '';
+    document.getElementById('hn').value = data.meta.hn || '';
+    document.getElementById('pid').value = data.meta.pid || '';
+    document.getElementById('diagnosis').value = data.meta.diagnosis || '';
+    document.getElementById('visit-date').value = data.meta.visit_date || '';
+    document.getElementById('first-visit').value = data.meta.first_visit || '';
+    document.getElementById('period-from').value = data.meta.period_from || '';
+    document.getElementById('period-to').value = data.meta.period_to || '';
+
+    caseType = data.meta.case_type || 'general';
+    document.querySelectorAll('.case-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.case === caseType);
+    });
+    relabelCaseBtns();
+
+    // ROWS
+    (data.rows || []).forEach(rd => {
+      // NA / missing
+      const naT = document.querySelector(`.toggle-mark[data-toggle="na"][data-row="${rd.id}"]`);
+      const msT = document.querySelector(`.toggle-mark[data-toggle="missing"][data-row="${rd.id}"]`);
+      if (naT) naT.classList.toggle('checked', !!rd.na);
+      if (msT) msT.classList.toggle('checked', !!rd.missing);
+      // criteria pills
+      (rd.criteria || []).forEach(c => {
+        const g = document.querySelector(`.pill-group[data-row="${rd.id}"][data-crit="${c.no}"]`);
+        if (!g) return;
+        g.querySelectorAll('.pill').forEach(p => p.className = 'pill');
+        if (c.value) {
+          g.dataset.activeVal = c.value;
+          const p = g.querySelector(`.pill[data-val="${c.value}"]`);
+          if (p) p.classList.add('active-' + (c.value === 'na' ? 'na' : c.value));
+        } else {
+          delete g.dataset.activeVal;
+        }
+      });
+      // bonus / deduct
+      const b = document.querySelector(`.bonus[data-row="${rd.id}"]`);
+      const d = document.querySelector(`.deduct[data-row="${rd.id}"]`);
+      if (b) b.value = rd.bonus || 0;
+      if (d) d.value = rd.deduct || 0;
+      // note
+      const note = document.querySelector(`.note-input[data-row="${rd.id}"]`);
+      if (note) note.value = rd.note || '';
+      // fu date — support new (string) and legacy (object) formats
+      if (rd.fu_date) {
+        const fEl = document.querySelector(`[data-fu-date="${rd.id}"]`);
+        if (fEl) {
+          if (typeof rd.fu_date === 'string') {
+            fEl.value = rd.fu_date;
+          } else if (typeof rd.fu_date === 'object') {
+            // legacy format: {d, m, y} where y is 2-digit BE
+            const d = String(rd.fu_date.d || '').padStart(2, '0');
+            const m = String(rd.fu_date.m || '').padStart(2, '0');
+            let y = parseInt(rd.fu_date.y);
+            if (!isNaN(y) && y < 100) y = 2500 + y - 543;
+            if (d && m && !isNaN(y)) fEl.value = `${y}-${m}-${d}`;
+          }
+        }
+      }
+    });
+
+    // findings
+    if (data.summary && data.summary.finding) {
+      const r = document.querySelector(`input[name="finding"][value="${data.summary.finding}"]`);
+      if (r) r.checked = true;
+    }
+    document.getElementById('issues-specify').value = (data.summary && data.summary.issues_specify) || '';
+
+    // signature
+    if (data.signature) {
+      const auditorVal = data.signature.auditor || '';
+      const sel = document.getElementById('auditor-select');
+      if (auditorVal && !auditors.includes(auditorVal)) {
+        auditors.push(auditorVal);
+        localStorage.setItem(AUDITOR_KEY, JSON.stringify(auditors));
+        refreshAuditorSelects();
+      }
+      sel.value = auditorVal;
+      document.getElementById('audit-date').value = data.signature.audit_date || '';
+    }
+
+    editingCaseId = data.id || null;
+    recalc();
+  }
+
+  /* ================================================================
+     RESTORE FROM FILE
+  ================================================================ */
+  document.getElementById('restore-input').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        // Support array (export all) or single object
+        if (Array.isArray(data)) {
+          if (confirm(`ไฟล์นี้มี ${data.length} เคส — ต้องการนำเข้าทั้งหมดเข้า Dashboard หรือไม่?`)) {
+            data.forEach(c => {
+              if (!cases.find(x => x.id === c.id)) cases.push(c);
+            });
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(cases));
+            alert('นำเข้าเรียบร้อย — ดูที่แท็บ Dashboard');
+            updateCaseCount();
+          }
+        } else {
+          loadData(data);
+          alert('โหลดเคสกลับสำเร็จ');
+        }
+      } catch (err) {
+        alert('ไฟล์ JSON ไม่ถูกต้อง: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  });
+
+  /* ================================================================
+     ACTIONS
+  ================================================================ */
+  function resetForm() {
+    if (!confirm('ต้องการล้างข้อมูลทั้งหมดในฟอร์มใช่หรือไม่?')) return;
+    document.querySelectorAll('input[type="text"], input[type="number"], input[type="date"]').forEach(i => {
+      if (i.readOnly) return;
+      // Keep default values for Hcode and Hname
+      if (i.id === 'hcode') { i.value = '10894'; return; }
+      if (i.id === 'hname') { i.value = 'โรงพยาบาลวังน้ำเขียว'; return; }
+      i.value = '';
+    });
+    document.querySelectorAll('.pill').forEach(p => p.className = 'pill');
+    document.querySelectorAll('.pill-group').forEach(g => delete g.dataset.activeVal);
+    document.querySelectorAll('.toggle-mark').forEach(t => t.classList.remove('checked'));
+    document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+    document.querySelectorAll('.num-input.bonus, .num-input.deduct').forEach(i => i.value = 0);
+    document.getElementById('auditor-select').value = '';
+    editingCaseId = null;
+    recalc();
+  }
+
+  function exportJSON() {
+    const data = gatherData();
+    downloadJSON(data, 'audit_' + (data.meta.hn || 'record') + '_' + new Date().toISOString().slice(0,10) + '.json');
+  }
+
+  function exportAllJSON() {
+    if (cases.length === 0) {
+      alert('ยังไม่มีเคสบันทึก');
+      return;
+    }
+    downloadJSON(cases, 'audit_all_' + new Date().toISOString().slice(0,10) + '.json');
+  }
+
+  function downloadJSON(obj, filename) {
+    const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function exportCSV() {
+    if (cases.length === 0) { alert('ยังไม่มีเคสบันทึก'); return; }
+    const header = ['Audit Date','HN','PID','Diagnosis','Case Type','Auditor','Score','Full Score','Threshold','Status','Finding','Notes'];
+    const rows = cases.map(c => {
+      const passed = c.summary.total_earned >= c.summary.threshold;
+      return [
+        c.signature.audit_date || c.saved_at.slice(0,10),
+        c.meta.hn,
+        c.meta.pid,
+        c.meta.diagnosis,
+        c.meta.case_type,
+        c.signature.auditor,
+        c.summary.total_earned,
+        c.summary.total_full,
+        c.summary.threshold,
+        passed ? 'PASS' : 'FAIL',
+        c.summary.finding || '',
+        (c.summary.issues_specify || '').replace(/"/g, '""')
+      ].map(v => `"${(v ?? '').toString().replace(/"/g, '""')}"`).join(',');
+    });
+    const csv = '\uFEFF' + header.join(',') + '\n' + rows.join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'audit_summary_' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function saveForm() {
+    const data = gatherData();
+    if (!data.meta.hn) {
+      if (!confirm('ยังไม่ได้กรอก HN — ต้องการบันทึกหรือไม่?')) return;
+    }
+    if (!data.signature.auditor) {
+      if (!confirm('ยังไม่ได้เลือกชื่อผู้ประเมิน — ต้องการบันทึกหรือไม่?')) return;
+    }
+
+    // Update or insert
+    const idx = cases.findIndex(c => c.id === data.id);
+    if (idx >= 0) {
+      cases[idx] = data;
+    } else {
+      cases.push(data);
+    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(cases));
+    editingCaseId = data.id;
+    updateCaseCount();
+
+    const passed = data.summary.total_earned >= data.summary.threshold;
+    alert(`บันทึกเคสเรียบร้อย\n\nHN: ${data.meta.hn || '-'}\nผู้ประเมิน: ${data.signature.auditor || '-'}\nคะแนน: ${data.summary.total_earned} / ${data.summary.total_full}\nเกณฑ์: ${data.summary.threshold}\nสถานะ: ${passed ? '✓ ผ่านเกณฑ์' : '✗ ไม่ผ่านเกณฑ์'}\n\nดูข้อมูลรวมที่แท็บ Dashboard`);
+  }
+
+  function updateCaseCount() {
+    document.getElementById('case-count').textContent = cases.length;
+  }
+  updateCaseCount();
+
+  /* ================================================================
+     DASHBOARD
+  ================================================================ */
+  function caseDate(c) {
+    const ad = (c.signature && c.signature.audit_date) || '';
+    if (ad) {
+      // New format: YYYY-MM-DD from date picker
+      if (/^\d{4}-\d{2}-\d{2}$/.test(ad)) {
+        const [y, m, d] = ad.split('-').map(Number);
+        return new Date(y, m - 1, d);
+      }
+      // Legacy format: วว/ดด/ปป (Buddhist 2-digit year)
+      const parts = ad.split('/').map(s => s.trim());
+      if (parts.length === 3) {
+        let d = parseInt(parts[0]);
+        let m = parseInt(parts[1]);
+        let y = parseInt(parts[2]);
+        if (y < 100) y = 2500 + y - 543;
+        else if (y > 2400) y = y - 543;
+        if (!isNaN(d) && !isNaN(m) && !isNaN(y)) {
+          return new Date(y, m - 1, d);
+        }
+      }
+    }
+    return new Date(c.saved_at);
+  }
+
+  function setupYearFilter() {
+    const yearSel = document.getElementById('filter-year');
+    const yearsSet = new Set();
+    cases.forEach(c => yearsSet.add(caseDate(c).getFullYear()));
+    const nowYear = new Date().getFullYear();
+    yearsSet.add(nowYear);
+    const years = Array.from(yearsSet).sort((a,b)=>b-a);
+    const cur = yearSel.value;
+    yearSel.innerHTML = '<option value="all">ทุกปี</option>' + years.map(y => `<option value="${y}">${y} (${y+543})</option>`).join('');
+    if (cur && [...yearSel.options].some(o => o.value === cur)) yearSel.value = cur;
+    else yearSel.value = nowYear.toString();
+  }
+
+  function filteredCases() {
+    const period = document.getElementById('filter-period').value;
+    const year = document.getElementById('filter-year').value;
+    const month = document.getElementById('filter-month').value;
+    const auditor = document.getElementById('filter-auditor').value;
+    const ct = document.getElementById('filter-case-type').value;
+
+    return cases.filter(c => {
+      const d = caseDate(c);
+      if (year !== 'all' && d.getFullYear() !== parseInt(year)) return false;
+      if (period === 'month' && month !== 'all' && d.getMonth() !== parseInt(month)) return false;
+      if (auditor !== 'all' && (c.signature.auditor || '') !== auditor) return false;
+      if (ct !== 'all' && c.meta.case_type !== ct) return false;
+      return true;
+    });
+  }
+
+  function renderDashboard() {
+    setupYearFilter();
+    refreshAuditorSelects();
+    const list = filteredCases();
+    const period = document.getElementById('filter-period').value;
+
+    // KPI
+    const total = list.length;
+    const pass = list.filter(c => c.summary.total_earned >= c.summary.threshold).length;
+    const fail = total - pass;
+    const avgEarned = total ? (list.reduce((s,c)=>s+c.summary.total_earned,0)/total) : 0;
+    const avgFull = total ? (list.reduce((s,c)=>s+c.summary.total_full,0)/total) : 0;
+
+    document.getElementById('kpi-total').textContent = total;
+    document.getElementById('kpi-pass').textContent = pass;
+    document.getElementById('kpi-fail').textContent = fail;
+    document.getElementById('kpi-pass-pct').textContent = total ? Math.round(pass/total*100) + '% ของทั้งหมด' : '0%';
+    document.getElementById('kpi-fail-pct').textContent = total ? Math.round(fail/total*100) + '% ของทั้งหมด' : '0%';
+    document.getElementById('kpi-avg').textContent = avgEarned.toFixed(1);
+    document.getElementById('kpi-avg-sub').textContent = 'จากเต็มเฉลี่ย ' + avgFull.toFixed(1);
+
+    // Month/year filter visibility
+    document.getElementById('month-filter-wrap').style.display = (period === 'month') ? 'flex' : 'none';
+
+    // Chart — group by month if period=month, by year if period=year, by month if all
+    renderChart(list, period);
+
+    // Table
+    renderCaseTable(list);
+  }
+
+  function renderChart(list, period) {
+    const chart = document.getElementById('bar-chart');
+    chart.innerHTML = '';
+    const sub = document.getElementById('chart-sub');
+
+    let groups = {};
+    let order = [];
+
+    if (period === 'year') {
+      sub.textContent = 'แสดงสัดส่วนผ่าน/ไม่ผ่าน แยกตามปี';
+      list.forEach(c => {
+        const d = caseDate(c);
+        const key = d.getFullYear().toString();
+        if (!groups[key]) { groups[key] = {pass:0, fail:0}; order.push(key); }
+        if (c.summary.total_earned >= c.summary.threshold) groups[key].pass++;
+        else groups[key].fail++;
+      });
+      order.sort();
+    } else {
+      // month grouping (default for 'month' and 'all')
+      sub.textContent = period === 'all' ? 'แสดงสัดส่วนผ่าน/ไม่ผ่าน รายเดือน (ทั้งหมด)' : 'แสดงสัดส่วนผ่าน/ไม่ผ่าน รายเดือน';
+      const monthNames = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+      list.forEach(c => {
+        const d = caseDate(c);
+        const key = d.getFullYear() + '-' + String(d.getMonth()).padStart(2, '0');
+        if (!groups[key]) {
+          groups[key] = {pass:0, fail:0, label: monthNames[d.getMonth()] + ' ' + (d.getFullYear()+543).toString().slice(-2)};
+          order.push(key);
+        }
+        if (c.summary.total_earned >= c.summary.threshold) groups[key].pass++;
+        else groups[key].fail++;
+      });
+      order.sort();
+    }
+
+    if (order.length === 0) {
+      chart.innerHTML = '<div style="margin:auto; color:var(--ink-soft); font-size:13px;">ไม่มีข้อมูลในช่วงที่เลือก</div>';
+      return;
+    }
+
+    const maxVal = Math.max(...order.map(k => groups[k].pass + groups[k].fail), 1);
+
+    order.forEach(k => {
+      const g = groups[k];
+      const total = g.pass + g.fail;
+      const heightPct = (total / maxVal) * 100;
+      const stackHeight = 180 * (heightPct / 100);
+      const passH = total ? (g.pass / total) * stackHeight : 0;
+      const failH = total ? (g.fail / total) * stackHeight : 0;
+      const label = g.label || k;
+
+      const col = document.createElement('div');
+      col.className = 'bar-col';
+      col.innerHTML = `
+        <div class="bar-value">${total}</div>
+        <div class="bar-stack" style="height:${stackHeight}px;">
+          <div class="bar-pass" style="height:${passH}px;" title="ผ่าน ${g.pass}"></div>
+          <div class="bar-fail" style="height:${failH}px;" title="ไม่ผ่าน ${g.fail}"></div>
+        </div>
+        <div class="bar-label">${label}</div>
+      `;
+      chart.appendChild(col);
+    });
+  }
+
+  function renderCaseTable(list) {
+    const tbody = document.getElementById('case-table-body');
+    const empty = document.getElementById('empty-state');
+    const tableEl = document.getElementById('case-table');
+
+    if (list.length === 0) {
+      tbody.innerHTML = '';
+      empty.style.display = 'block';
+      tableEl.style.display = 'none';
+      return;
+    }
+    empty.style.display = 'none';
+    tableEl.style.display = 'table';
+
+    // sort by date desc
+    const sorted = list.slice().sort((a,b) => caseDate(b) - caseDate(a));
+
+    tbody.innerHTML = sorted.map(c => {
+      const passed = c.summary.total_earned >= c.summary.threshold;
+      const d = caseDate(c);
+      const dateStr = String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + (d.getFullYear()+543).toString().slice(-2);
+      return `
+        <tr>
+          <td>${dateStr}</td>
+          <td><strong>${escapeHTML(c.meta.hn || '-')}</strong></td>
+          <td>${escapeHTML(c.meta.diagnosis || '-')}</td>
+          <td>${c.meta.case_type === 'general' ? 'General' : 'Chronic'}</td>
+          <td>${escapeHTML(c.signature.auditor || '-')}</td>
+          <td style="text-align:center; font-weight:600;">${c.summary.total_earned} / ${c.summary.total_full}</td>
+          <td style="text-align:center;">
+            <span class="${passed ? 'status-pass' : 'status-fail'}">${passed ? '✓ ผ่าน' : '✗ ไม่ผ่าน'}</span>
+          </td>
+          <td style="text-align:center;">
+            <button class="row-action" onclick="editCase('${c.id}')">✎ แก้ไข</button>
+            <button class="row-action" onclick="exportSingle('${c.id}')">⬇ JSON</button>
+            <button class="row-action danger" onclick="deleteCase('${c.id}')">🗑 ลบ</button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function editCase(id) {
+    const c = cases.find(x => x.id === id);
+    if (!c) return;
+    loadData(c);
+    // switch to audit tab
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(x => x.classList.remove('active'));
+    document.querySelector('[data-tab="audit"]').classList.add('active');
+    document.getElementById('tab-audit').classList.add('active');
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+
+  function exportSingle(id) {
+    const c = cases.find(x => x.id === id);
+    if (!c) return;
+    downloadJSON(c, 'audit_' + (c.meta.hn || 'record') + '_' + new Date().toISOString().slice(0,10) + '.json');
+  }
+
+  function deleteCase(id) {
+    if (!confirm('ต้องการลบเคสนี้ใช่หรือไม่?')) return;
+    cases = cases.filter(c => c.id !== id);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(cases));
+    updateCaseCount();
+    renderDashboard();
+  }
+
+  function clearAllCases() {
+    if (!confirm('ต้องการลบ ทุกเคส ที่บันทึกไว้ใช่หรือไม่? (ลบไม่สามารถกู้คืนได้ แนะนำให้ Export ก่อน)')) return;
+    cases = [];
+    localStorage.removeItem(STORAGE_KEY);
+    updateCaseCount();
+    renderDashboard();
+  }
+
+  // Filter listeners
+  ['filter-period','filter-year','filter-month','filter-auditor','filter-case-type'].forEach(id => {
+    document.getElementById(id).addEventListener('change', renderDashboard);
+  });
+
+  /* ================================================================
+     UTILS
+  ================================================================ */
+  function escapeHTML(s) {
+    return (s || '').toString()
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+  }
+  function escapeAttr(s) {
+    return (s || '').toString().replace(/"/g, '&quot;').replace(/&/g,'&amp;');
+  }
+
+  // INITIAL
+  recalc();
+
+  // Set today's date as default Audit Date
+  (function setTodayDefault() {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    document.getElementById('audit-date').value = `${yyyy}-${mm}-${dd}`;
+  })();
+</script>
+</body>
+</html>
